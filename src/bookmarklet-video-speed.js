@@ -1,20 +1,19 @@
 (() => {
-    const prefix        =   'nunsez-video-bookmarklet'
-    const defaultSpeed  =   100
-    const storageId     =   `${prefix}-memory`
-    const controllerId  =   `${prefix}-controller`
-    const datalistId    =   `${prefix}-tickmarks`
-    const styles        =   {
-        default:    'box-sizing: border-box;',
-        spacing:    'margin: 0; padding: 4px;',
-        borders:    'border: 1px solid #444;border-radius: 4px;background-color: #eee;',
-        controls:   'display: flex;justify-content: space-between;align-items: center;',
-        btn:        'width: 20px;height: 20px;margin: 0;padding: 0;',
-        value:      'pointer-events: none;',
-        range:      'width: 100%;',
-        controller: `position: fixed;left: 8px;top: 8px;width: 150px; font: 15px monospace;
-                    color: #111;box-shadow: 1px 1px 4px #444;user-select: none;z-index: 999999999;`,
-    }
+    const prefix = 'nunsez-video-bookmarklet'
+    const defaultSpeed = 100
+    const storageId = `${prefix}-memory`
+    const controllerId = `${prefix}-controller`
+    const datalistId = `${prefix}-tickmarks`
+    const stylesheetId = `${prefix}-stylesheet`
+    const styles = `#${controllerId} * { box-sizing: border-box; }`
+        + `#${controllerId}, #${controllerId} .range, #${controllerId} .controls {margin: 0;padding: 4px;}`
+        + `#${controllerId}, #${controllerId} .btn {border: 1px solid #444;border-radius: 4px;background-color: #eee;}`
+        + `#${controllerId} {position: fixed;left: 8px;top: 8px;width: 150px;font: 15px monospace;color: #111;box-shadow: 1px 1px 4px #444;z-index: 999999999;}`
+        + `#${controllerId} .controls {display: flex;justify-content: space-between;align-items: center;}`
+        + `#${controllerId} .btn {width: 20px;height: 20px;margin: 0;padding: 0;}`
+        + `#${controllerId} .value {pointer-events: none;user-select: none;}`
+        + `#${controllerId} .value::after {content: "%";margin-left: 2px;}`
+        + `#${controllerId} .range {width: 100%;}`
 
     const getDatalistOptions = (valueList) => valueList.map((v) => `<option value="${v}"></option>`).join('\n')
 
@@ -34,7 +33,7 @@
             default:                state.speed = newSpeed;                                 break
         }
 
-        state.value.textContent = state.speed + '%'
+        state.value.textContent = state.speed
         state.range.value = state.speed
         state.videos.forEach((v) => v.playbackRate = state.speed / 100)
         localStorage.setItem(storageId, state.speed)
@@ -61,7 +60,8 @@
         return videos.length ? videos : null
     }
 
-    const main = (body) => {
+    const main = (document) => {
+        const { head, body } = document
         const state = {
             speed: getSpeed(),
             videos: getVideos(body),
@@ -75,59 +75,50 @@
             return
         }
 
-        // remove controller if exist and restore video playback speed
+        // remove controller if exist and restore video playback speed / toggle effect
         if (state.oldController) {
             state.oldController.remove()
             state.videos.forEach((v) => v.playbackRate = 1)
             return
         }
 
+        // add controller stylesheet if not exist
+        if (!head.querySelector(`#${stylesheetId}`)) {
+            const stylesheet = document.createElement('style')
+            stylesheet.setAttribute('id', stylesheetId)
+            stylesheet.type = 'text/css'
+            stylesheet.textContent = styles
+            head.append(stylesheet)
+        }
+
         // create controller and his components
         const controller = document.createElement('div')
         controller.setAttribute('id', controllerId)
-        controller.style = styles.default + styles.spacing + styles.borders + styles.controller
-
-        const controls = document.createElement('div')
-        controls.style = styles.default + styles.spacing + styles.controls
-
-        const btnSub = document.createElement('button')
-        btnSub.textContent = '-'
-        btnSub.style = styles.default + styles.borders + styles.btn
-
-        const value = document.createElement('div')
-        value.style = styles.default + styles.value
-        state.value = value
-
-        const btnAdd = document.createElement('button')
-        btnAdd.textContent = '+'
-        btnAdd.style = styles.default + styles.borders + styles.btn
-
-        const datalist = document.createElement('datalist')
-        datalist.setAttribute('id', datalistId)
-        datalist.innerHTML = getDatalistOptions([10, 50, 100, 150, 200, 250, 300])
-
-        const range = document.createElement('input')
-        range.type = 'range'
-        range.min = 10
-        range.max = 300
-        range.step = 10
-        range.setAttribute('list', datalist.getAttribute('id'))
-        range.style = styles.default + styles.spacing + styles.range
-        state.range = range
+        controller.innerHTML = '<div class="controls">'
+            + '<button class="btn sub">-</button>'
+            + '<div class="value"></div>'
+            + '<button class="btn add">+</button></div>'
+            + `<input type="range" class="range" min="10" max="300" step="10" list="${datalistId}">`
+            + `<datalist id="${datalistId}">`
+            + getDatalistOptions([10, 50, 100, 150, 200, 250, 300])
+            + '</datalist>'
 
         // append elements to body tag
-        controls.append(btnSub, value, btnAdd)
-        controller.append(controls, range, datalist)
         body.append(controller)
 
+        state.value = controller.querySelector('.value')
+        state.range = controller.querySelector('.range')
+        const btnSub = controller.querySelector('.sub')
+        const btnAdd = controller.querySelector('.add')
+
         // add listeners
-        btnSub.addEventListener('click',    () => setSpeed(state.speed - 5, state))
-        btnAdd.addEventListener('click',    () => setSpeed(state.speed + 5, state))
-        range.addEventListener('input',     () => setSpeed(Number.parseFloat(range.value), state))
+        state.range.addEventListener('input', () => setSpeed(Number.parseFloat(state.range.value), state))
+        btnSub.addEventListener('click', () => setSpeed(state.speed - 5, state))
+        btnAdd.addEventListener('click', () => setSpeed(state.speed + 5, state))
 
         // init controller
         setSpeed(state.speed, state)
     }
 
-    main(document.body)
+    main(document)
 })()
