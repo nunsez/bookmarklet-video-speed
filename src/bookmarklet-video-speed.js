@@ -37,8 +37,6 @@ const setSpeed = (newSpeed, state) => {
 
 const getDatalistOptions = (valueList) => valueList.map((v) => `<option value="${v}"></option>`).join('\n')
 
-const body = document.querySelector('body')
-
 const main = (body) => {
     const state = {
         speed: getSpeed(),
@@ -111,4 +109,4 @@ const main = (body) => {
     setSpeed(state.speed, state)
 }
 
-main(body)
+main(document.body)
