@@ -1,3 +1,11 @@
+/**
+ * @file A script to control the speed of html5 video playback in the browser.
+ * @author Alexander Mandrikov <mad.nunsez@gmail.com>
+ * @version 1.0.0
+ * @license Apache-2.0
+ * @see {@link https://github.com/nunsez/bookmarklet-video-speed GitHub} for further information.
+*/
+
 (() => {
     const prefix = 'nunsez-video-bookmarklet'
     const defaultSpeed = 100
