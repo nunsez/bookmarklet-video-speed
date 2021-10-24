@@ -25,7 +25,14 @@
 
     const getDatalistOptions = (valueList) => valueList.map((v) => `<option value="${v}"></option>`).join('\n')
 
-    const getIDoc = (ref) => ref.contentWindow.document || ref.contentDocument
+    const getIDoc = (ref) => {
+        try {
+            return ref.contentWindow.document || ref.contentDocument
+        } catch {
+            console.log("iframe document is not reachable: " + ref.src)
+            return null
+        }
+    }
 
     const getSpeed = () => localStorage.getItem(storageId) || defaultSpeed
 
@@ -57,7 +64,7 @@
                     break
                 }
                 case 'IFRAME': {
-                    const vid = getIDoc(el).querySelector('video')
+                    const vid = getIDoc(el)?.querySelector('video')
                     if (vid?.playbackRate) videos.push(vid)
                     break
                 }
