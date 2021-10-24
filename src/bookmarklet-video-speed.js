@@ -13,10 +13,10 @@
     const controllerId = `${prefix}-controller`
     const datalistId = `${prefix}-tickmarks`
     const stylesheetId = `${prefix}-stylesheet`
-    const styles = `#${controllerId} * { box-sizing: border-box; }`
+    const styles = `#${controllerId} * {box-sizing: border-box;color: #111;line-height:initial}`
         + `#${controllerId}, #${controllerId} .range, #${controllerId} .controls {margin: 0;padding: 4px;}`
         + `#${controllerId}, #${controllerId} .btn {border: 1px solid #444;border-radius: 4px;background-color: #eee;}`
-        + `#${controllerId} {position: fixed;left: 8px;top: 8px;width: 150px;font: 15px monospace;color: #111;box-shadow: 1px 1px 4px #444;z-index: 999999999;}`
+        + `#${controllerId} {position: fixed;left: 8px;top: 8px;width: 150px;font: 15px monospace;box-shadow: 1px 1px 4px #444;z-index: 999999999;}`
         + `#${controllerId} .controls {display: flex;justify-content: space-between;align-items: center;}`
         + `#${controllerId} .btn {width: 20px;height: 20px;margin: 0;padding: 0;}`
         + `#${controllerId} .value {pointer-events: none;user-select: none;}`
