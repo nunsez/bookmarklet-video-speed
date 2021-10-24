@@ -1,7 +1,7 @@
 /**
  * @file A script to control the speed of html5 video playback in the browser.
  * @author Alexander Mandrikov <mad.nunsez@gmail.com>
- * @version 1.0.0
+ * @version 1.0.1
  * @license Apache-2.0
  * @see {@link https://github.com/nunsez/bookmarklet-video-speed GitHub} for further information.
 */
