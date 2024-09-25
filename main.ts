@@ -1,13 +1,14 @@
 /**
  * @file A script to control the speed of html5 video playback in the browser.
  * @author Alexander Mandrikov <mad.nunsez@gmail.com>
- * @version 2.0.0
+ * @version 2.0.1
  * @license AGPLv3
  * @see {@link https://github.com/nunsez/bookmarklet-video-speed GitHub} for further information.
  */
 
 const PREFIX = "nunsez-video-bookmarklet";
 const DEFAULT_SPEED = 100;
+const SEARCH_TIMEOUT = 350;
 const STORAGE_ID = `${PREFIX}-memory`;
 const CONTROLLER_ID = `${PREFIX}-controller`;
 const TICKMARKS_ID = `${PREFIX}-tickmarks`;
@@ -76,15 +77,17 @@ class State {
 
   constructor(document: Document) {
     this.document = document;
-    this.speed = DEFAULT_SPEED;
+    this.speed = State.getSpeed();
     this.oldController = document.querySelector<HTMLDivElement>(
-      CONTROLLER_ID,
+      `#${CONTROLLER_ID}`,
     );
   }
 
   initialize(_mutationRecords: MutationRecord[]) {
-    this.videos = State.getVideos(document.body);
-    this.speed = State.getSpeed();
+    setTimeout(() => {
+      this.videos = State.getVideos(this.document.body);
+      this.setSpeed(this.speed);
+    }, SEARCH_TIMEOUT);
   }
 
   get controller(): Controller {
@@ -188,6 +191,7 @@ class Controller {
 
   #buildValue(): HTMLDivElement {
     this.value = document.createElement("div");
+    this.value.textContent = this.state.speed.toString();
     return this.value;
   }
 
@@ -206,6 +210,7 @@ class Controller {
     this.range.setAttribute("max", "300");
     this.range.setAttribute("step", "10");
     this.range.setAttribute("list", TICKMARKS_ID);
+    this.range.value = this.state.speed.toString();
     return this.range;
   }
 
@@ -224,19 +229,17 @@ class Controller {
   }
 }
 
-function main(document: Document) {
+function main(window: Window) {
+  const document = window.document;
   const state = new State(document);
-  state.initialize([]);
-
-  if (state.videos.length === 0) {
-    alert("Sorry, i can't find any html5 videos :(");
-    return;
-  }
 
   // remove controller if exist and restore video playback speed / toggle effect
   if (state.oldController) {
     state.oldController.remove();
-    state.videos.forEach((v) => v.playbackRate = DEFAULT_SPEED / 100);
+    const videos = State.getVideos(document.body);
+    setTimeout(() => {
+      videos.forEach((v) => v.playbackRate = DEFAULT_SPEED / 100);
+    }, SEARCH_TIMEOUT + 5);
     return;
   }
 
@@ -244,13 +247,15 @@ function main(document: Document) {
   addStyles(document);
 
   // reset reinitialize on body changes
-  const observer = new MutationObserver(state.initialize);
+  const observer = new MutationObserver((mutations) =>
+    state.initialize(mutations)
+  );
   observer.observe(document.body, { childList: true });
 
   // create controller and his components
   state.controller = new Controller(state);
   // append controller to body tag
-  state.controller.append(document.body);
+  state.controller.append(state.document.body);
 }
 
-main(document);
+main(window);

@@ -1,6 +1,4 @@
 {
-  "version": "2.0.0",
-  "license": "AGPLv3",
   "tasks": {
     "dev": "deno run --watch main.ts",
     "bundle": "deno run bundle.ts"
