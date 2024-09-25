@@ -8,7 +8,7 @@
 
 const PREFIX = "nunsez-video-bookmarklet";
 const DEFAULT_SPEED = 100;
-const SEARCH_TIMEOUT = 350;
+const SEARCH_TIMEOUT = 500;
 const STORAGE_ID = `${PREFIX}-memory`;
 const CONTROLLER_ID = `${PREFIX}-controller`;
 const TICKMARKS_ID = `${PREFIX}-tickmarks`;
