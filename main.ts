@@ -1,7 +1,7 @@
 /**
  * @file A script to control the speed of html5 video playback in the browser.
  * @author Alexander Mandrikov <mad.nunsez@gmail.com>
- * @version 2.1.0
+ * @version 2.1.1
  * @license AGPLv3
  * @see {@link https://github.com/nunsez/bookmarklet-video-speed GitHub} for further information.
  */
@@ -27,7 +27,7 @@ const STYLES =
   `#${CONTROLLER_ID} .range ~ * {display: none;}`;
 
 interface MyElement extends HTMLDivElement {
-  [STATE_ID]?: State
+  [STATE_ID]?: State;
 }
 
 function addStyles(document: Document) {
@@ -101,8 +101,8 @@ class State {
   }
 
   refresh(_mutationRecords: MutationRecord[]) {
-    console.log('_mutationRecords', _mutationRecords)
-    console.log('refresh', this.searchTimeoutId, this.controller);
+    console.log("_mutationRecords", _mutationRecords);
+    console.log("refresh", this.searchTimeoutId, this.controller);
     clearTimeout(this.searchTimeoutId);
 
     this.searchTimeoutId = setTimeout(() => {
@@ -112,8 +112,10 @@ class State {
   }
 
   terminate() {
-    console.log('terminate observer', this.observer)
-    console.log('terminate oldController', this.controller)
+    console.log("terminate observer", this.observer);
+    console.log("terminate oldController", this.controller);
+    console.log("terminate searchTimeoutId", this.searchTimeoutId);
+    clearTimeout(this.searchTimeoutId);
     this.observer.disconnect();
     this.controller.el.remove();
     this.videos.forEach((v) => v.playbackRate = DEFAULT_SPEED / 100);
@@ -140,7 +142,7 @@ class State {
     this.controller.range.value = speedString;
     this.videos.forEach((v) => v.playbackRate = this.speed / 100);
 
-    console.log('set speed', this.videos, this.controller);
+    console.log("set speed", this.videos, this.controller);
 
     localStorage.setItem(STORAGE_ID, speedString);
   }
